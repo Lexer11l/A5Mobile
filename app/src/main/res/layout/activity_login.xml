@@ -14,7 +14,7 @@
         android:layout_alignParentTop="true"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="143dp"
-        android:text="input ip of raspberry" />
+        android:text="10.242.1.169" />
 
     <EditText
         android:layout_width="wrap_content"
@@ -22,7 +22,7 @@
         android:id="@+id/editText3"
         android:layout_centerVertical="true"
         android:layout_centerHorizontal="true"
-        android:text="input ip of raspberry" />
+        android:text="8283" />
 
     <Button
         android:layout_width="wrap_content"
