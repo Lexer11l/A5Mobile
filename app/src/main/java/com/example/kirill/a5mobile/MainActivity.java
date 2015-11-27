@@ -16,7 +16,6 @@ import android.widget.Toast;
 import android.widget.ToggleButton;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.OutputStreamWriter;
@@ -32,30 +31,46 @@ public class MainActivity extends Activity {
     static Switch swtch;
     static CheckBox checkBox;
     static ToggleButton tglbtn;
-    private DataInputStream in;
+    private BufferedReader in;
     private  PrintWriter out;
     static String ip;
     static int port;
     static Socket socket;
+    static boolean buttonState;
 
 
     class ClientThread implements Runnable {
 
         @Override
         public void run() {
-
+        String state;
             try {
                 InetAddress serverAddr = InetAddress.getByName(ip);
                 socket = new Socket(serverAddr, port);
                     out = new PrintWriter(new BufferedWriter(
                             new OutputStreamWriter(socket.getOutputStream())),true);
-                in =  new DataInputStream(socket.getInputStream());
-            } catch (IOException e) {
-                    e.printStackTrace();
+                 in  = new
+                        BufferedReader(new
+                        InputStreamReader(socket.getInputStream()));
+                while(true){
+                    state = in.readLine();
+                    if (state.equals("true")){
+                        buttonState=true;
+                    }
+                    else{
+                        if (state.equals("false")){
+                            buttonState=false;                        }
+                    }
                 }
+                }
+            catch (IOException e) {
+                e.printStackTrace();
 
         }
+        }
     }
+
+
 
 
     public MainActivity() {
@@ -76,7 +91,6 @@ public class MainActivity extends Activity {
         ip = intent.getStringExtra("ip");
         port = intent.getIntExtra("port", 8283);
         new Thread(new ClientThread()).start();
-
         swtch.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
             public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
@@ -157,51 +171,34 @@ public class MainActivity extends Activity {
                 if (resultCode == RESULT_OK && null != data) {
                     ArrayList<String> result = data
                             .getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
-                    switch (result.get(0)){
-                        case "dark":
-                        {
+                    switch (result.get(0)) {
+                        case "dark": {
                             swtch.setChecked(false);
                             out.println("dark");
                             break;
                         }
-                        case "light":
-                        {
+                        case "light": {
                             swtch.setChecked(true);
-                                out.println("light");
+                            out.println("light");
                             break;
                         }
-                        case "open":
-                        {
+                        case "open": {
                             tglbtn.setChecked(true);
                             out.println("open");
                             break;
                         }
-                        case "close":
-                        {
+                        case "close": {
                             tglbtn.setChecked(false);
                             out.println("close");
                             break;
                         }
-                        case "state":{
-                            Toast.makeText(getApplicationContext(), " " + checkBox.isChecked(), Toast.LENGTH_SHORT).show();
-                            out.println("state");
-                            String state="";
-                            try {
-                                state = in.readUTF();
-                            } catch (IOException e) {
-                                e.printStackTrace();
-                            }
-                            if (state.equals("true")){
-                                checkBox.setChecked(true);
-                            }
-                            else{
-                                checkBox.setChecked(false);
-                            }
+                        case "state": {
+                            checkBox.setChecked(buttonState);
                             break;
                         }
-                    }
 
-                }
+
+                    }                }
                 break;
             }
 
